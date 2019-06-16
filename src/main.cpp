@@ -1,4 +1,4 @@
-#include <igl/viewer/Viewer.h>
+#include <igl/opengl/glfw/Viewer.h>
 #include "collision_detect.h"
 #include "mesh.h"
 #include <string>
@@ -35,14 +35,14 @@ TriangleMesh getTriangleMesh(std::string file) {
 }
 
 void plot_mesh(TriangleMesh mesh) {
-  igl::viewer::Viewer viewer;
-  viewer.data.set_mesh(mesh.V, mesh.F);
-  viewer.data.set_face_based(true);
+  igl::opengl::glfw::Viewer viewer;
+  viewer.data().set_mesh(mesh.V, mesh.F);
+  viewer.data().set_face_based(true);
   viewer.launch();
 }
 
 void visualizeCollisions(TriangleMesh *mesh, std::vector<std::pair<int,int>> collisions) {
-    
+
   for (int i =0; i < collisions.size(); i++) {
     std::cout << "------" << std::endl;
     std::cout << "Collision " << i << "/" << collisions.size() << std::endl;
@@ -50,10 +50,10 @@ void visualizeCollisions(TriangleMesh *mesh, std::vector<std::pair<int,int>> col
     int tri2 = collisions.at(i).second;
     std::cout << "TRI INDS: " << tri1 << " " << tri2 << std::endl;
 
-    Eigen::MatrixXd points1 = 
+    Eigen::MatrixXd points1 =
       BVHNode::triangleToPoints(&(mesh->V), mesh->F.row(tri1));
 
-    Eigen::MatrixXd points2 = 
+    Eigen::MatrixXd points2 =
       BVHNode::triangleToPoints(&(mesh->V), mesh->F.row(tri2));
 
     Eigen::MatrixXd intersectV(6, 3);
@@ -72,7 +72,7 @@ void visualizeCollisions(TriangleMesh *mesh, std::vector<std::pair<int,int>> col
 
 int main(int argc, char *argv[])
 {
-  
+
   // Get input mesh file
   if (argc < 2) {
     std::cout << "Input file name/ext as cmd line argument" << std::endl;
@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
 
   // Collision detector
   CollisionDetect *cd = new CollisionDetect();
-  std::vector<std::pair<int, int>> collisions = 
+  std::vector<std::pair<int, int>> collisions =
     cd->findCollisions(&(mesh.V), &(mesh.F));
   std::cout << "COLLISIONS: " << collisions.size() << std::endl;
-  
+
   // Plot the mesh and show collisions
   if (VISUALIZATION) {
     plot_mesh(mesh);

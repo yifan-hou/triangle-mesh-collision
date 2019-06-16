@@ -1,4 +1,5 @@
 #include "collision_detect.h"
+#include <ctime>
 
 bool TIMING = false;
 bool INSPECT_TREE = false;
