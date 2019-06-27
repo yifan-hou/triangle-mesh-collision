@@ -1,95 +1,53 @@
-#include <igl/opengl/glfw/Viewer.h>
-#include "collision_detect.h"
-#include "mesh.h"
 #include <string>
 #include <iostream>
-#include <igl/readPLY.h>
-#include "bvh.h"
+#include <fstream>
+#include <CGAL/Aff_transformation_3.h>
+#include <CGAL/Cartesian.h>
+#include <CGAL/IO/STL_reader.h>
+#include <CGAL/Surface_mesh.h>
+#include <CGAL/Polygon_mesh_processing/intersection.h>
+#include <CGAL/Polygon_mesh_processing/transform.h>
+#include <ctime>
+#include <Eigen/Dense>
 
-bool VISUALIZATION = true;
+typedef CGAL::Simple_cartesian<double> K;
+typedef CGAL::Surface_mesh<K::Point_3> Mesh;
 
-TriangleMesh getTriangleMesh(std::string file) {
-
-  Eigen::MatrixXd V;
-  Eigen::MatrixXi F;
-
-  std::string fileExt = file.substr(file.find_last_of(".") + 1);
-  std::string meshFilepath = "../meshes/" + file;
-  if (fileExt == "off") {
-    igl::readOFF(meshFilepath,V,F);
-  } else if (fileExt == "ply") {
-    igl::readPLY(meshFilepath,V,F);
-  } else {
-    // other file types, implement as necessary
-  }
-
-  if (V.rows() == 0) {
-    std::cout << "Mesh not found: " + meshFilepath << std::endl;
-    exit(-1);
-  }
-
-  TriangleMesh m;
-  m.V = V;
-  m.F = F;
-  return m;
-}
-
-void plot_mesh(TriangleMesh mesh) {
-  igl::opengl::glfw::Viewer viewer;
-  viewer.data().set_mesh(mesh.V, mesh.F);
-  viewer.data().set_face_based(true);
-  viewer.launch();
-}
-
-void visualizeCollisions(TriangleMesh *mesh, std::vector<std::pair<int,int>> collisions) {
-
-  for (int i =0; i < collisions.size(); i++) {
-    std::cout << "------" << std::endl;
-    std::cout << "Collision " << i << "/" << collisions.size() << std::endl;
-    int tri1 = collisions.at(i).first;
-    int tri2 = collisions.at(i).second;
-    std::cout << "TRI INDS: " << tri1 << " " << tri2 << std::endl;
-
-    Eigen::MatrixXd points1 =
-      BVHNode::triangleToPoints(&(mesh->V), mesh->F.row(tri1));
-
-    Eigen::MatrixXd points2 =
-      BVHNode::triangleToPoints(&(mesh->V), mesh->F.row(tri2));
-
-    Eigen::MatrixXd intersectV(6, 3);
-    intersectV << points1, points2;
-    Eigen::MatrixXi intersectF = (Eigen::MatrixXi(2,3) <<
-      0, 1, 2,
-      3, 4, 5
-    ).finished();
-    TriangleMesh m;
-    m.V = intersectV;
-    m.F = intersectF;
-    plot_mesh(m);
-  }
-}
-
+namespace PMP = CGAL::Polygon_mesh_processing;
 
 int main(int argc, char *argv[])
 {
-
-  // Get input mesh file
-  if (argc < 2) {
-    std::cout << "Input file name/ext as cmd line argument" << std::endl;
-    exit(-1);
+  const char* filename1 = "../meshes/BIG_SCREW.off";
+  std::ifstream input1(filename1);
+  Mesh mesh1;
+  if (!input1 || !(input1 >> mesh1) || !CGAL::is_triangle_mesh(mesh1))
+  {
+    std::cerr << "Not a valid input file." << std::endl;
+    return 1;
   }
-  std::string file = argv[1];
-  TriangleMesh mesh = getTriangleMesh(file);
 
-  // Collision detector
-  CollisionDetect *cd = new CollisionDetect();
-  std::vector<std::pair<int, int>> collisions =
-    cd->findCollisions(&(mesh.V), &(mesh.F));
-  std::cout << "COLLISIONS: " << collisions.size() << std::endl;
+  const char* filename2 = "../meshes/fingertip_8faces.off";
+  std::ifstream input2(filename2);
+  Mesh mesh2;
+  if (!input2 || !(input2 >> mesh2) || !CGAL::is_triangle_mesh(mesh2))
+  {
+    std::cerr << "Not a valid input file." << std::endl;
+    return 1;
+  }
 
-  // Plot the mesh and show collisions
-  if (VISUALIZATION) {
-    plot_mesh(mesh);
-    visualizeCollisions(&mesh, collisions);
+  Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
+  for (int i = 0; i < 10; ++i) {
+    double begin = std::clock();
+    Eigen::Vector3d p;
+    p << 0, 2*i, 0;
+    K::Aff_transformation_3 transform_cgal(
+        R(0,0), R(0,1), R(0,2), p(0),
+        R(1,0), R(1,1), R(1,2), p(1),
+        R(2,0), R(2,1), R(2,2), p(2), 1);
+    // K::Aff_transformation_3 transform_cgal(CGAL::TRANSLATION, K::Vector_3(0,i*2,0));
+    PMP::transform (transform_cgal, mesh1);
+    bool intersecting = PMP::do_intersect (mesh1, mesh2);
+    std::cout << "Computation Time: " << (std::clock() - begin) / CLOCKS_PER_SEC << " sec" << std::endl;
+    std::cout << "intersecting: " << intersecting << std::endl;
   }
 }

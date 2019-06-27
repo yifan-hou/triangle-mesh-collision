@@ -1,28 +1,62 @@
 #ifndef __COLLISION_DETECT_H__
 #define __COLLISION_DETECT_H__
 
+#include <string>
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
-#include <queue>
-#include <iostream>
-#include "bvh.h"
-#include "bounding_box.h"
+
+#include <CGAL/Cartesian.h>
+#include <CGAL/Surface_mesh.h>
+#include <CGAL/Aff_transformation_3.h>
+#include <CGAL/draw_surface_mesh.h>
+#include <CGAL/IO/STL_reader.h>
+#include <CGAL/Polygon_mesh_processing/intersection.h>
+#include <CGAL/Polygon_mesh_processing/transform.h>
+
+namespace COLLISION_DETECTION {
+
+typedef CGAL::Simple_cartesian<double> K;
+typedef CGAL::Surface_mesh<K::Point_3> Mesh;
 
 class CollisionDetect{
- 
-  public:   
+
+  public:
     CollisionDetect(){};
     ~CollisionDetect(){};
-    std::vector<std::pair<int, int>> findCollisions(Eigen::MatrixXd *V, Eigen::MatrixXi *F);
+    /**
+     * Load model files into freaking CGAL format. CGAL only supports .off
+     * format.
+     *
+     * @param[in]  filename1  The filename for object 1
+     * @param[in]  filename2  The filename for object 2
+     *
+     * @return     true if both files are load successfully.
+     */
+    bool initialize(std::string filename1, std::string filename2);
+    /**
+     * Set the transformation for object one.
+     *
+     * @param[in]  R     The rotation matrix.
+     * @param[in]  p     The translation
+     */
+    void setTransformation1(const Eigen::Matrix3d &R,
+            const Eigen::Vector3d &p);
+    void setTransformation2(const Eigen::Matrix3d &R,
+            const Eigen::Vector3d &p);
+    /**
+     * Check if the transformed object 1 and 2 has collision.
+     *
+     * @return     true if a collision happens.
+     */
+    bool checkCollisions();
 
+    void draw();
   private:
-    std::vector<Eigen::MatrixXd>* getAllTrianglePoints(Eigen::MatrixXd *V, Eigen::MatrixXi *F);
-    BVHNode* loadMeshToBVH(Eigen::MatrixXd *V, Eigen::MatrixXi *F, std::vector<Eigen::MatrixXd> *allTriPoints);
-    std::vector<std::pair<int, int>>* findCollisionCandidates(BVHNode* root, Eigen::MatrixXd *V, Eigen::MatrixXi *F, std::vector<Eigen::MatrixXd> *allTriPoints);
-    std::vector<std::pair<int, int>>* findCollisionsFromCandidates(std::vector<std::pair<int, int>>* candidates, Eigen::MatrixXd *V, Eigen::MatrixXi *F, std::vector<Eigen::MatrixXd> *allTriPoints);
-    bool triNeighbors(int indOne, int indTwo, std::vector<Eigen::MatrixXd> *allTriPoints);
-    bool trianglesIntersect(Eigen::MatrixXd *pointsOne, Eigen::MatrixXd *pointsTwo);
-    bool edgeTriangleIntersect(Eigen::Vector3d v0, Eigen::Vector3d v1, Eigen::Vector3d t0, Eigen::Vector3d t1, Eigen::Vector3d t2);
+    Mesh mesh1_, mesh2_;
+    Mesh mesh_transformed1_, mesh_transformed2_;
 };
+
+}
 
 #endif
