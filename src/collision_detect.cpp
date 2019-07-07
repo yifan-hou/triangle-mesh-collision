@@ -24,13 +24,6 @@ bool CollisionDetect::initialize(std::string filename1, std::string filename2) {
     return false;
   }
 
-  // debug
-  // std::cout << "mesh2_: " << std::endl;
-  // for (auto vertex_iterator : mesh2_.vertices()) {
-  //   K::Point_3 p = mesh2_.point(vertex_iterator);
-  //   std::cout << "p: " << p << std::endl;
-  // }
-
   // This is deep copy according to
   //  https://doc.cgal.org/latest/Surface_mesh/classCGAL_1_1Surface__mesh.html
   mesh_transformed1_ = mesh1_;
@@ -55,12 +48,6 @@ void CollisionDetect::setTransformation2(const Eigen::Matrix3d &R,
       R(0,0), R(0,1), R(0,2), p(0),
       R(1,0), R(1,1), R(1,2), p(1),
       R(2,0), R(2,1), R(2,2), p(2), 1);
-  // for (int i = 0; i < 4; ++i) {
-  //   for (int j = 0; j < 4; ++j) {
-  //     std::cout << transform.hm(i, j) << " ";
-  //   }
-  //   std::cout << std::endl;
-  // }
   PMP::transform (transform, mesh_transformed2_);
 }
 
@@ -70,6 +57,52 @@ bool CollisionDetect::checkCollisions(){
 
 void CollisionDetect::draw(){
   CGAL::draw(mesh_transformed1_);
+}
+
+
+
+bool RayTracing::initialize(std::string filename) {
+  std::ifstream input(filename);
+  if (!input || !(input >> mesh_) || !CGAL::is_triangle_mesh(mesh_))
+  {
+    std::cerr << "Not a valid input file: " << filename << std::endl;
+    return false;
+  }
+  return true;
+}
+
+std::vector<Eigen::Vector3d> RayTracing::findIntersections(
+    const Eigen::Vector3d &p, const Eigen::Vector3d &n) {
+
+  // construct the ray object
+  assert(n.norm() > 1e-1); // n should not be zero length.
+  Point p_cgal = Point(p[0], p[1], p[2]);
+  Vector v_cgal = Vector(n[0], n[1], n[2]);
+  Ray ray(p_cgal, v_cgal);
+  // construct the AABB tree TODO(yifan) move it to initialization
+  Tree tree(faces(mesh_).first, faces(mesh_).second, mesh_);
+  // compute intersections
+  std::list<Ray_intersection> intersections;
+
+  // Ray_intersection ray_intersection = tree.first_intersection(ray);
+  // if(tree.do_intersect(ray))
+  //   std::cout << "intersection(s)" << std::endl;
+  // else
+  //   std::cout << "no intersection" << std::endl;
+  // std::cout << tree.number_of_intersected_primitives(ray)
+  //     << " intersection(s)" << std::endl;
+
+  tree.all_intersections(ray, std::back_inserter(intersections));
+  // read results
+  std::vector<Eigen::Vector3d> intersections_eigen_format;
+  for (Ray_intersection i:intersections) {
+    if(boost::get<Point>(&(i->first))){
+      const Point* p =  boost::get<Point>(&(i->first) );
+      intersections_eigen_format.push_back(
+          Eigen::Vector3d(p->x(), p->y(), p->z()));
+    }
+  }
+  return intersections_eigen_format;
 }
 
 } // namespace COLLISION_DETECTION
