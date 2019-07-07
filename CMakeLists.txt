@@ -6,14 +6,23 @@ include_directories(include/
 
 # CGAL
 find_package(CGAL)
+
+##
+## Build
+##
 add_library(${PROJECT_NAME} SHARED
 	src/collision_detect.cpp
 )
 target_link_libraries(${PROJECT_NAME} CGAL::CGAL)
 
-add_executable(collision_test src/test.cpp)
-target_link_libraries(collision_test ${PROJECT_NAME})
+##
+## Tests
+##
+add_executable(collision_detection_test src/collision_detection_test.cpp)
+target_link_libraries(collision_detection_test ${PROJECT_NAME})
 
+add_executable(ray_tracing_test src/ray_tracing_test.cpp)
+target_link_libraries(ray_tracing_test ${PROJECT_NAME})
 
 # ############################### Install
 # headers
