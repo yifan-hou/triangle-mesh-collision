@@ -1,17 +1,37 @@
 # triangle-mesh-collision
+This is a wrapper of CGAL using Eigen data type. Currently supporting:
+- Triangle to triangle collision detection between two meshes.
+- Ray-tracing on a mesh.
 
-Self collision detection for triangles meshes. Implementation in C++, uses Eigen and [libigl](http://libigl.github.io/libigl/) libraries.
+# Install
+## Dependencies
+**Eigen** : Eigen should come with Ubuntu 18.04.
+**CGAL** : The library that does the actual work. https://github.com/CGAL/cgal
+The installation of CGAL can be nasty. The following procedure should work.
+If you miss any dependency, this document is a good reference(though it is for an older version)
+https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxzaW5naHN1a2hyYWp8Z3g6MThiNjRkNjhhMWY0ZjgyYw
+Note you don't have to install QT. It is only useful for visualization with CGAL, which we don't need for now.
 
-**To use:**  
-  1. Create build directory (`mkdir build`)  
-  2. `cd build/`  
-  3. Run cmake on project (`cmake ..`)  
-  4. Make project (`make`)  
-  5. Place object file into `meshes/` directory. 
-  6. Inside build folder, run `./collision_bin FILE_NAME.EXT`
+1. Download the CGAL release: go to https://github.com/CGAL/cgal/releases, scroll down to `CGAL-4.1`, click to unfold `Assets`, download `CGAL-4.14.tar.xz`.
+2. Unzip the file.
+2. Build and install:
+```
+    cd CGAL-4.14
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make
+    sudo make install
+```
+## Build and install
+Now you have all the dependencies, go back to this folder and:
+```
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make
+    sudo make install
+```
 
 **Notes**
-
-* Currently only supports .off and .ply file types. Check the available `igl::readEXT()` methods to add support for different file types. Add to `getTriangleMesh()` method in `main.cpp`
-* Toggle the bool `VISUALIZATION` at top of `main.cpp` to show/hide object and collision results
-* Make sure CMake can find libigl on your machine. Inside the `cmake/FindLIBIGL.cmake`, include the path to your local copy of libigl
+* Currently only supports .off file type.
