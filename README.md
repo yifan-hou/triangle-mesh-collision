@@ -6,13 +6,15 @@ This is a wrapper of CGAL using Eigen data type. Currently supporting:
 # Install
 ## Dependencies
 **Eigen** : Eigen should come with Ubuntu 18.04.
-**CGAL** : The library that does the actual work. https://github.com/CGAL/cgal
+
+[**CGAL**](https://github.com/CGAL/cgal): The library that does the actual work.
+
 The installation of CGAL can be nasty. The following procedure should work.
-If you miss any dependency, this document is a good reference(though it is for an older version)
-https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxzaW5naHN1a2hyYWp8Z3g6MThiNjRkNjhhMWY0ZjgyYw
+
+If you miss any dependency, [this document](https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxzaW5naHN1a2hyYWp8Z3g6MThiNjRkNjhhMWY0ZjgyYw) is a good reference(though it is for an older version)
 Note you don't have to install QT. It is only useful for visualization with CGAL, which we don't need for now.
 
-1. Download the CGAL release: go to https://github.com/CGAL/cgal/releases, scroll down to `CGAL-4.1`, click to unfold `Assets`, download `CGAL-4.14.tar.xz`.
+1. Download the CGAL release from [here](https://github.com/CGAL/cgal/releases), scroll down to `CGAL-4.1`, click to unfold `Assets`, download `CGAL-4.14.tar.xz`.
 2. Unzip the file.
 2. Build and install:
 ```
