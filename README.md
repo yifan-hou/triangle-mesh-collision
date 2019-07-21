@@ -25,6 +25,7 @@ Note you don't have to install QT. It is only useful for visualization with CGAL
     make
     sudo make install
 ```
+
 ## Build and install
 Now you have all the dependencies, go back to this folder and:
 ```
