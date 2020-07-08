@@ -5,6 +5,8 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#define EIGEN_USE_NEW_STDVECTOR
+#include <Eigen/StdVector>
 
 #include <CGAL/AABB_tree.h>
 #include <CGAL/AABB_traits.h>
@@ -97,7 +99,7 @@ namespace COLLISION_DETECTION {
      *
      * @return     true if a collision happens.
      */
-    std::vector<Eigen::Vector3d> findIntersections(
+    std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>> findIntersections(
         const Eigen::Vector3d &p, const Eigen::Vector3d &n);
 
   private:

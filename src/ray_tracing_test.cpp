@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   RayTracing rt;
   rt.initialize(filename);
 
-  std::vector<Eigen::Vector3d> intersections;
+  std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>> intersections;
   double begin = std::clock();
   for (int i = 0; i < 500; ++i) {
     Eigen::Vector3d n, p;

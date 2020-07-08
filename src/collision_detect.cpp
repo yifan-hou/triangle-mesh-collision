@@ -71,7 +71,7 @@ bool RayTracing::initialize(std::string filename) {
   return true;
 }
 
-std::vector<Eigen::Vector3d> RayTracing::findIntersections(
+std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>> RayTracing::findIntersections(
     const Eigen::Vector3d &p, const Eigen::Vector3d &n) {
 
   // construct the ray object
@@ -94,7 +94,7 @@ std::vector<Eigen::Vector3d> RayTracing::findIntersections(
 
   tree.all_intersections(ray, std::back_inserter(intersections));
   // read results
-  std::vector<Eigen::Vector3d> intersections_eigen_format;
+  std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>> intersections_eigen_format;
   for (Ray_intersection i:intersections) {
     if(boost::get<Point>(&(i->first))){
       const Point* p =  boost::get<Point>(&(i->first) );
