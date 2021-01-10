@@ -4,6 +4,12 @@ This is a wrapper of CGAL using Eigen data type. Currently supporting:
 - Ray-tracing on a mesh.
 
 # Install
+If installing to home folder, add
+```
+-DCMAKE_INSTALL_PREFIX=$HOME
+```
+to every cmake command.
+
 ## Dependencies
 **Eigen** : Eigen should come with Ubuntu 18.04.
 

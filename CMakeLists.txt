@@ -27,11 +27,11 @@ target_link_libraries(ray_tracing_test ${PROJECT_NAME})
 # ############################### Install
 # headers
 install(DIRECTORY include/
-    DESTINATION /usr/local/include/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
     FILES_MATCHING PATTERN "*.h"
     )
 
 # binaries
 install(TARGETS ${PROJECT_NAME}
-    DESTINATION /usr/local/lib/${PROJECT_NAME}
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${PROJECT_NAME}
     )
