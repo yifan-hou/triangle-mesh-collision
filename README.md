@@ -32,6 +32,19 @@ Note you don't have to install QT. It is only useful for visualization with CGAL
     sudo make install
 ```
 
+You might be missing mpfr. You can install the binary version by
+```
+sudo apt install libmpfr-dev
+```
+Or install from source. First, download it from https://ftp.gnu.org/gnu/mpfr/ (e.g. mpfr-4.1.0.zip), then
+```
+unzip mpfr-4.1.0.zip
+cd mpfr-4.1.0
+./configure
+make
+sudo make install
+```
+
 ## Build and install
 Now you have all the dependencies, go back to this folder and:
 ```
